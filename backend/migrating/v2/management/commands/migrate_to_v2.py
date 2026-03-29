@@ -336,14 +336,15 @@ class DataMigrator:
             None
         """
         try:
-            column_type_query = f"""
+            dest_cursor.execute(
+                """
                 SELECT data_type
                 FROM information_schema.columns
-                WHERE table_schema = '{self.v2_schema}' AND table_name = '{dest_table}'
+                WHERE table_schema = %s AND table_name = %s
                 AND column_name = 'id';
-            """
-
-            dest_cursor.execute(column_type_query)
+                """,
+                (self.v2_schema, dest_table),
+            )
             result = dest_cursor.fetchone()
 
             if not result:
